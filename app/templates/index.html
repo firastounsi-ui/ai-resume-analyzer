@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Analyzer</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+</head>
+<body class="bg-light">
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+
+                <div class="text-center mb-4">
+                    <h1 class="fw-bold">AI Resume Analyzer</h1>
+                    <p class="text-muted">
+                        Paste your resume and optionally a job description to get AI-powered feedback.
+                    </p>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <form id="analyze-form">
+                            <div class="mb-3">
+                                <label for="resume" class="form-label fw-semibold">Resume Text</label>
+                                <textarea
+                                    id="resume"
+                                    class="form-control"
+                                    rows="10"
+                                    placeholder="Paste your resume text here..."
+                                    required
+                                ></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="job" class="form-label fw-semibold">Job Description (Optional)</label>
+                                <textarea
+                                    id="job"
+                                    class="form-control"
+                                    rows="8"
+                                    placeholder="Paste the job description here..."
+                                ></textarea>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    Analyze Resume
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 mb-4">Analysis Result</h2>
+
+                        <div id="loading" class="alert alert-info d-none" role="alert">
+                            Analyzing resume...
+                        </div>
+
+                        <div id="result" class="d-none">
+                            <div class="mb-4">
+                                <h3 class="h5">Strengths</h3>
+                                <ul id="strengths-list" class="list-group"></ul>
+                            </div>
+
+                            <div class="mb-4">
+                                <h3 class="h5">Weaknesses</h3>
+                                <ul id="weaknesses-list" class="list-group"></ul>
+                            </div>
+
+                            <div class="mb-4">
+                                <h3 class="h5">Suggestions</h3>
+                                <ul id="suggestions-list" class="list-group"></ul>
+                            </div>
+
+                            <div class="mb-4">
+                                <h3 class="h5">Match Summary</h3>
+                                <div id="match-summary" class="border rounded p-3 bg-light"></div>
+                            </div>
+
+                            <div>
+                                <h3 class="h5">Match Score</h3>
+                                <span id="match-score" class="badge text-bg-primary fs-6"></span>
+                            </div>
+                        </div>
+
+                        <div id="error-box" class="alert alert-danger d-none mt-3" role="alert"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("analyze-form");
+        const loadingBox = document.getElementById("loading");
+        const resultBox = document.getElementById("result");
+        const errorBox = document.getElementById("error-box");
+
+        const strengthsList = document.getElementById("strengths-list");
+        const weaknessesList = document.getElementById("weaknesses-list");
+        const suggestionsList = document.getElementById("suggestions-list");
+        const matchSummary = document.getElementById("match-summary");
+        const matchScore = document.getElementById("match-score");
+
+        function fillList(element, items) {
+            element.innerHTML = "";
+
+            items.forEach(item => {
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.textContent = item;
+                element.appendChild(li);
+            });
+        }
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const resumeText = document.getElementById("resume").value;
+            const jobDescription = document.getElementById("job").value;
+
+            loadingBox.classList.remove("d-none");
+            resultBox.classList.add("d-none");
+            errorBox.classList.add("d-none");
+            errorBox.textContent = "";
+
+            try {
+                const response = await fetch("/analyze", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        resume_text: resumeText,
+                        job_description: jobDescription || null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || "Request failed.");
+                }
+
+                fillList(strengthsList, data.strengths || []);
+                fillList(weaknessesList, data.weaknesses || []);
+                fillList(suggestionsList, data.suggestions || []);
+
+                matchSummary.textContent = data.match_summary || "No match summary available.";
+                matchScore.textContent = data.match_score !== null
+                    ? data.match_score + "/100"
+                    : "N/A";
+
+                resultBox.classList.remove("d-none");
+            } catch (error) {
+                errorBox.textContent = "Something went wrong: " + error.message;
+                errorBox.classList.remove("d-none");
+            } finally {
+                loadingBox.classList.add("d-none");
+            }
+        });
+    </script>
+</body>
+</html>
