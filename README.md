@@ -15,8 +15,9 @@
 
 ## Overview
 
-AI Resume Analyzer is a full-stack web application that analyzes resume text using an AI model and provides structured feedback such as strengths, weaknesses, suggestions, and a job match score.
+AI Resume Analyzer is a full-stack web application that uses an AI model to analyze resumes and provide structured, actionable feedback. 
 
+Users can input a resume and optionally a job description to receive insights such as strengths, weaknesses, improvement suggestions, and a job match score.
 ---
 
 ## Features
