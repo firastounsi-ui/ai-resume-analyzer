@@ -1,5 +1,7 @@
 # AI Resume Analyzer
 
+## 🚀 Live Demo
+👉 [Click here to try the app](https://ai-resume-analyzer-ckb1.onrender.com)
 ## Screenshots
 
 ### Home Page
