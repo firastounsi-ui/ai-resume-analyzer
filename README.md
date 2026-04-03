@@ -151,4 +151,4 @@ Looking for a working student backend developer with API and database skills.
 
 ## Disclaimer
 
-This tool provides AI-generated feedback and should be used as guidance, not as a definitive evaluation.![Home](screenshots/home.png)
+This tool provides AI-generated feedback and should be used as guidance, not as a definitive evaluation.
